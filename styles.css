@@ -1,0 +1,356 @@
+/* --- Color Palette --- */
+:root {
+    --forest-green: #2C4A22;
+    --leaf-green: #4A7836;
+    --wood-brown: #5C4033;
+    --light-wood: #8B5A2B;
+    --hedgehog-belly: #E8DCC4;
+    --bg-color: #F4EFE6;
+    --text-dark: #332B25;
+}
+
+/* --- Base Reset & Layout --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html {
+    height: 100%;
+    background-color: #222;
+    /* Dark background outside the phone area on desktop */
+}
+
+body {
+    height: 100%;
+    background-color: var(--bg-color);
+    /* The beige hedgehog background */
+    color: var(--text-dark);
+    overflow: hidden;
+
+    /* LOCK TO PHONE SIZE */
+    max-width: 430px;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+/* --- Header & Timer --- */
+.app-header {
+    height: 60px;
+    background-color: var(--forest-green);
+    color: var(--hedgehog-belly);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+    /* LOCK HEADER TO PHONE SIZE */
+    position: fixed;
+    top: 0;
+    width: 100%;
+    max-width: 430px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.timer {
+    background-color: var(--wood-brown);
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-family: monospace;
+    font-size: 1.1rem;
+}
+
+/* --- Swiper Layout --- */
+.swiper {
+    width: 100%;
+    height: calc(100% - 60px);
+    margin-top: 60px;
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px 15px 100px 15px;
+    /* Extra bottom padding so card clears arrows */
+    overflow-y: auto;
+}
+
+.swiper-slide div {
+    margin-bottom: 12.5px !important;
+    /* Adjust this value (e.g., 5px) */
+}
+
+/* --- Cards (Form Containers) --- */
+.card {
+    background-color: white;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 15px;
+    padding: 18px;
+    box-shadow: 0 4px 15px rgba(92, 64, 51, 0.1);
+    border-top: 5px solid var(--leaf-green);
+    position: relative;
+    z-index: 2;
+}
+
+.card h2 {
+    color: var(--wood-brown);
+    margin-bottom: 12px;
+    border-bottom: 2px dashed var(--hedgehog-belly);
+    padding-bottom: 6px;
+}
+
+/* --- Form Inputs --- */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label.field-label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 2px;
+    color: var(--forest-green);
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--hedgehog-belly);
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #FAFAFA;
+    color: var(--text-dark);
+    resize: none;
+    height: 35px !important;
+    /* padding: 5px 10px !important; */
+}
+
+
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--hedgehog-belly);
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: #FAFAFA;
+    color: var(--text-dark);
+    resize: none;
+    height: 50px !important;
+    /* Forces a very short overall height */
+    /*padding: 2px 8px !important;*/
+    /* Shrinks the empty space above and below the text */
+    /* font-size: 0.9rem !important; */
+}
+
+input[type="number"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--leaf-green);
+}
+
+
+/* --- The Toggle Switch --- */
+.switch-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    /* Reduced from 60px */
+    height: 24px;
+    /* Reduced from 34px */
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: .4s;
+    border-radius: 24px;
+    /* Matches new height */
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    /* Reduced from 26px */
+    width: 16px;
+    /* Reduced from 26px */
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+/* WHEN TRUE / CHECKED: Green background, knob on the LEFT */
+input:checked+.slider {
+    background-color: var(--leaf-green);
+}
+
+input:checked+.slider:before {
+    transform: translateX(0);
+    /* Keeps knob on the left */
+}
+
+/* WHEN FALSE / UNCHECKED: Gray background, knob on the RIGHT */
+input:not(:checked)+.slider {
+    background-color: #ccc;
+}
+
+input:not(:checked)+.slider:before {
+    transform: translateX(16px);
+    /* 40px width - 16px knob - 8px total padding */
+    /* Moves knob to the right */
+}
+
+/* --- Buttons --- */
+.btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+}
+
+.action-btn {
+    background-color: var(--wood-brown);
+}
+
+/* --- Report Output --- */
+/* --- Report Output --- */
+#report-output {
+    margin-top: 20px;
+    background-color: var(--hedgehog-belly);
+    padding: 15px;
+    border-radius: 8px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    display: none;
+
+    /* NEW SCROLLING RULES */
+    max-height: 325px;
+    /* Limits the height of the box. You can increase/decrease this number! */
+    overflow-y: auto;
+    /* Turns on a vertical scrollbar inside just this box if the text is long */
+}
+
+/* --- Swiper Customizations --- */
+.swiper-pagination-bullet-active {
+    background: var(--forest-green) !important;
+}
+
+.swiper-pagination {
+    bottom: 5px !important;
+}
+
+/* Custom Arrow Styling - Below the card */
+.swiper-button-next,
+.swiper-button-prev {
+    top: auto !important;
+    bottom: 25px !important;
+    margin-top: 0 !important;
+    color: var(--forest-green) !important;
+    background-color: var(--hedgehog-belly);
+
+    /* REDUCED PADDING: This makes the button box smaller */
+    padding: 12px 20px;
+    border-radius: 10px;
+    height: auto !important;
+    box-shadow: 0 4px 6px rgba(92, 64, 51, 0.2);
+}
+
+/* NEW: This makes the actual arrow icon inside the button smaller */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 16px !important;
+    font-weight: bold;
+}
+
+.swiper-button-prev {
+    left: 16px !important;
+}
+
+.swiper-button-next {
+    right: 16px !important;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background-color: #D8CCB4;
+}
+
+
+
+/* --- Multi-Select Chips --- */
+.multiselect-container {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allows chips to wrap to the next line */
+    gap: 10px;
+    /* Space between chips */
+    margin-top: 5px;
+}
+
+.multi-option {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    /* Removes blue flash on mobile tap */
+}
+
+/* Hide the default checkbox completely */
+.multi-option input[type="checkbox"] {
+    display: none !important;
+}
+
+/* Style the text label to look like a button */
+.multi-option span {
+    display: inline-block;
+    padding: 4px 8px;
+    background-color: var(--hedgehog-belly);
+    color: var(--wood-brown);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    user-select: none;
+}
+
+/* When the hidden checkbox is checked, style the adjacent span! */
+.multi-option input:checked+span {
+    background-color: var(--leaf-green);
+    color: white;
+    border-color: var(--forest-green);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}

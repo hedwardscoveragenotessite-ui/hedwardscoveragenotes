@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hedgehog Coverage Notes</title>
+
+  <!-- Swiper.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <!-- Top bar with Timer -->
+  <header class="app-header">
+    <div class="title">🦔 Coverage Notes</div>
+    <div class="timer" id="timer">00:00</div>
+  </header>
+
+  <!-- Slider main container -->
+  <div class="swiper">
+    <div class="swiper-wrapper" id="slider-wrapper">
+
+      <!-- Custom Notes Slides will be injected here by JavaScript -->
+
+      <!-- Final Slide: Report (Always at the end) -->
+      <div class="swiper-slide report-slide" id="final-slide">
+        <div class="card">
+          <h2>🌲 End of Session</h2>
+          <p>Use the arrows or swipe back to edit notes, or generate your final report below.</p>
+
+          <button id="end-btn" class="btn action-btn">🛑 Generate & Copy Report</button>
+
+          <pre id="report-output"></pre>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Navigation Arrows -->
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+
+    <!-- Swiper Pagination (dots at the bottom) -->
+    <div class="swiper-pagination"></div>
+  </div>
+
+  <!-- Swiper.js JS -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <!-- Custom JS -->
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
