@@ -162,16 +162,31 @@ function renderPages() {
             } else if (field.type === 'toggle') {
                 // CHANGED: Dynamically apply 'checked' and 'ON' based on the new default state
                 const isChecked = appState[field.id];
-                html += `
+                if (field.label === "Hallway") {
+                    html += `
           <div class="switch-container">
           <label class="field-label">${field.label}</label>
             <label class="switch">
               <input type="checkbox" class="state-updater" id="${field.id}" ${isChecked ? 'checked' : ''}>
               <span class="slider"></span>
             </label>
-            <span class="status-text" id="label-${field.id}">Status: ${isChecked ? 'CLEAR' : 'NOT CLEAR'}</span>
+            <span class="status-text" id="label-${field.id}">${isChecked ? 'CLEAR' : 'NOT CLEAR'}</span>
           </div>
         `;
+                }
+                else {
+                    html += `
+ <div class="switch-container">
+          <label class="field-label">${field.label}</label>
+            <label class="switch">
+              <input type="checkbox" class="state-updater" id="${field.id}" ${isChecked ? 'checked' : ''}>
+              <span class="slider"></span>
+            </label>
+            <span class="status-text" id="label-${field.id}">${isChecked ? 'LOCKED' : 'UNLOCKED'}</span>
+          </div>
+`;
+                }
+
             }
 
 
@@ -228,7 +243,22 @@ document.addEventListener('change', (e) => {
         if (target.type === 'checkbox' && !target.classList.contains('multi-updater')) {
             const isChecked = target.checked;
             appState[id] = isChecked;
-            document.getElementById(`label-${id}`).textContent = isChecked ? 'Status: CLEAR' : 'Status: NOT CLEAR';
+            // document.getElementById(`label-${id}`).textContent = isChecked ? 'Status: CLEAR' : 'Status: NOT CLEAR';
+            // 1. Find the specific field in your config using the ID
+            let currentField = null;
+            pagesConfig.forEach(page => {
+                let found = page.fields.find(f => f.id === id);
+                if (found) currentField = found;
+            });
+
+            // 2. Change the text based on what the label is
+            if (currentField && currentField.label === "Hallway") {
+                // If it's a hallway
+                document.getElementById(`label-${id}`).textContent = isChecked ? 'CLEAR' : 'NOT CLEAR';
+            } else {
+                // For all other toggles (like Study Rooms)
+                document.getElementById(`label-${id}`).textContent = isChecked ? 'LOCKED' : 'UNLOCKED';
+            }
 
             // Visibility Logic
             pagesConfig.forEach(page => {
@@ -316,7 +346,13 @@ document.getElementById('end-btn').addEventListener('click', () => {
 
             let value = appState[field.id];
             if (field.type === 'toggle') {
-                value = value ? 'CLEAR' : 'NOT CLEAR';
+                if (field.label === 'Hallway') {
+                    value = value ? 'CLEAR' : 'NOT CLEAR';
+                }
+                else {
+                    value = value ? 'LOCKED' : 'UNLOCKED';
+                }
+                //value = value ? 'CLEAR' : 'NOT CLEAR';
             } else if (field.type === 'multiselect') {
                 // Join the array with commas, or print 'None' if empty
                 if (value.length > 0) {
@@ -351,5 +387,24 @@ document.getElementById('end-btn').addEventListener('click', () => {
         });
     } else {
         alert("Report generated! Please select the text box and copy it manually.");
+    }
+});
+
+// --- 8. Auto-Scroll to Top on Enter ---
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        // If the user is typing in a number input, remove focus to close the mobile keyboard
+        if (e.target.tagName === 'INPUT') {
+            e.target.blur();
+        }
+
+        // Find the currently active slide and smoothly scroll it to the top
+        const activeSlide = document.querySelector('.swiper-slide-active');
+        if (activeSlide) {
+            activeSlide.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
     }
 });
