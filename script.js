@@ -1,90 +1,10 @@
-// --- 1. Page Configuration ---
-// const pagesConfig = [
-//     {
-//         title: "🍃 Hedden 5th floor",
-//         fields: [
-//             { id: "h5-hallway", type: "toggle", label: "Hallway", },
-//             // This field will be hidden on load because defaults to true
-//             { id: "h5-hallway-count", type: "number", label: "Number of people in hallway", showIfFalse: "h5-hallway" },
-//             { id: "h5-north", type: "number", label: "North Common Room" },
-//             { id: "h5-south", type: "number", label: "South Common Room" },
-//             { id: "h5-notes", type: "textarea", label: "General Notes" }
-//         ]
-//     },
-//     {
-//         title: "🍃 Hedden 4th floor",
-//         fields: [
-//             { id: "h4-hallway", type: "toggle", label: "Hallway", },
-//             // This field will be hidden on load because defaults to true
-//             { id: "h4-hallway-count", type: "number", label: "Number of people in hallway", showIfFalse: "h4-hallway" },
-//             { id: "h4-north", type: "number", label: "North Common Room" },
-//             { id: "h4-south", type: "number", label: "South Common Room" },
-//             { id: "h4-notes", type: "textarea", label: "General Notes" }
-//         ]
-//     },
-//     {
-//         title: "🍃 Hedden 3rd floor",
-//         fields: [
-//             { id: "h3-hallway", type: "toggle", label: "Hallway", },
-//             // This field will be hidden on load because defaults to true
-//             { id: "h3-hallway-count", type: "number", label: "Number of people in hallway", showIfFalse: "h3-hallway" },
-//             { id: "h3-north", type: "number", label: "North Common Room" },
-//             { id: "h3-south", type: "number", label: "South Common Room" },
-//             { id: "h3-notes", type: "textarea", label: "General Notes" }
-//         ]
-//     },
-//     {
-//         title: "🍃 Hedden 2nd floor",
-//         fields: [
-//             { id: "h2-hallway", type: "toggle", label: "Hallway", },
-//             // This field will be hidden on load because defaults to true
-//             { id: "h2-hallway-count", type: "number", label: "Number of people in hallway", showIfFalse: "h2-hallway" },
-//             { id: "h2-north", type: "number", label: "North Common Room" },
-//             { id: "h2-south", type: "number", label: "South Common Room" },
-//             { id: "h2-notes", type: "textarea", label: "General Notes" }
-//         ]
-//     },
-//     {
-//         title: "🍃 Hedden 1st floor",
-//         fields: [
-//             { id: "h1-hallway", type: "toggle", label: "Hallway", },
-//             // This field will be hidden on load because defaults to true
-//             { id: "h1-hallway-count", type: "number", label: "Number of people in hallway", showIfFalse: "h4-hallway" },
-//             { id: "h1-north", type: "number", label: "North Common Room" },
-//             { id: "h1-south", type: "number", label: "South Common Room" },
-//             { id: "h1-notes", type: "textarea", label: "General Notes" }
-//         ]
-//     },
-//     {
-//         title: "🌲 Additional Metrics",
-//         fields: [
-//             { id: "p2-signal", type: "number", label: "Signal Strength" },
-//             { id: "p2-battery", type: "number", label: "Battery Level (%)" },
-//             { id: "p2-notes", type: "textarea", label: "Metric Notes" }
-//         ]
-//     }
-// ];
-
-// --- 2. Global State ---
+// --- 1. Global State & Route Data ---
 let appState = {};
 let timeElapsed = 0;
+let currentConfig = [];
+let currentRouteTitle = "";
 
-// Initialize state with default values
-pagesConfig.forEach(page => {
-    page.fields.forEach(field => {
-        if (field.type === 'toggle') {
-            appState[field.id] = true;
-        } else if (field.type === 'multiselect') {
-            appState[field.id] = []; // Multi-selects start as an empty list
-        } else if (field.type == 'number') {
-            appState[field.id] = 0
-        } else {
-            appState[field.id] = '';
-        }
-    });
-});
-
-// --- 3. Timer Logic ---
+// --- 2. Timer Logic ---
 const timerDisplay = document.getElementById('timer');
 setInterval(() => {
     timeElapsed++;
@@ -93,11 +13,47 @@ setInterval(() => {
     timerDisplay.textContent = `${minutes}:${seconds}`;
 }, 1000);
 
+// --- 3. Route Selection Logic ---
+// This waits for you to pick a route on the first slide before building the app
+document.querySelectorAll('.route-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        const routeKey = e.target.getAttribute('data-route');
+
+        // Grab the specific title and pages array for the chosen route from config.js
+        currentRouteTitle = allConfigs[routeKey].routeTitle;
+        currentConfig = allConfigs[routeKey].pages;
+
+        // Initialize state for ONLY this specific route
+        currentConfig.forEach(page => {
+            page.fields.forEach(field => {
+                if (field.type === 'toggle') {
+                    appState[field.id] = true;
+                } else if (field.type === 'multiselect') {
+                    appState[field.id] = []; // Multi-selects start as an empty list
+                } else if (field.type == 'number') {
+                    appState[field.id] = 0;
+                } else {
+                    appState[field.id] = '';
+                }
+            });
+        });
+
+        // Build the HTML and move to the first page
+        renderPages();
+        swiper.update();
+        swiper.slideNext();
+
+        // Lock the menu so it can't be clicked twice
+        e.target.parentElement.innerHTML = '<h2>✅ Route Loaded</h2><p>Swipe right to begin your tour.</p>';
+    });
+});
+
 // --- 4. Dynamic Slide Generation ---
 function renderPages() {
     const finalSlide = document.getElementById('final-slide');
 
-    pagesConfig.forEach((page) => {
+    // Changed from pagesConfig to currentConfig
+    currentConfig.forEach((page) => {
         let html = `
       <div class="swiper-slide">
         <div class="card">
@@ -106,7 +62,6 @@ function renderPages() {
 
         page.fields.forEach((field) => {
             // Determine if this field should be hidden on initial load
-            // Determine if this field should be hidden on initial load
             let isHidden = false;
 
             // Check for hallway toggles
@@ -114,7 +69,7 @@ function renderPages() {
                 isHidden = true;
             }
 
-            // NEW: Check for zero counts
+            // Check for zero counts
             if (field.hideIfZero && (appState[field.hideIfZero] == 0 || appState[field.hideIfZero] === '')) {
                 isHidden = true;
             }
@@ -144,28 +99,30 @@ function renderPages() {
             <textarea id="${field.id}" rows="3" placeholder="Type here..."></textarea>
         `;
             } else if (field.type === 'multiselect') {
-                //html += `<label class="field-label">${field.label}</label>`;
                 html += `<div class="multiselect-container">`;
 
-                field.options.forEach((option) => {
-                    html += `
-            <label class="multi-option">
-              <!-- Using data-group to link it to the field ID -->
-              <input type="checkbox" class="multi-updater" data-group="${field.id}" value="${option}">
-              <span>${option}</span>
-            </label>
-          `;
-                });
+                if (field.options) {
+                    field.options.forEach((option) => {
+                        html += `
+                <label class="multi-option">
+                  <!-- Using data-group to link it to the field ID -->
+                  <input type="checkbox" class="multi-updater" data-group="${field.id}" value="${option}">
+                  <span>${option}</span>
+                </label>
+              `;
+                    });
+                }
 
                 html += `</div>`;
 
             } else if (field.type === 'toggle') {
-                // CHANGED: Dynamically apply 'checked' and 'ON' based on the new default state
                 const isChecked = appState[field.id];
+
+                // Retained your specific logic for Hallway vs Locked/Unlocked
                 if (field.label === "Hallway") {
                     html += `
-          <div class="switch-container">
           <label class="field-label">${field.label}</label>
+          <div class="switch-container">
             <label class="switch">
               <input type="checkbox" class="state-updater" id="${field.id}" ${isChecked ? 'checked' : ''}>
               <span class="slider"></span>
@@ -173,22 +130,19 @@ function renderPages() {
             <span class="status-text" id="label-${field.id}">${isChecked ? 'CLEAR' : 'NOT CLEAR'}</span>
           </div>
         `;
-                }
-                else {
+                } else {
                     html += `
- <div class="switch-container">
           <label class="field-label">${field.label}</label>
+          <div class="switch-container">
             <label class="switch">
               <input type="checkbox" class="state-updater" id="${field.id}" ${isChecked ? 'checked' : ''}>
               <span class="slider"></span>
             </label>
             <span class="status-text" id="label-${field.id}">${isChecked ? 'LOCKED' : 'UNLOCKED'}</span>
           </div>
-`;
+        `;
                 }
-
             }
-
 
             html += `</div>`;
         });
@@ -197,9 +151,6 @@ function renderPages() {
         finalSlide.insertAdjacentHTML('beforebegin', html);
     });
 }
-
-// Build the DOM
-renderPages();
 
 // --- 5. Initialize Swiper.js ---
 const swiper = new Swiper('.swiper', {
@@ -243,32 +194,29 @@ document.addEventListener('change', (e) => {
         if (target.type === 'checkbox' && !target.classList.contains('multi-updater')) {
             const isChecked = target.checked;
             appState[id] = isChecked;
-            // document.getElementById(`label-${id}`).textContent = isChecked ? 'Status: CLEAR' : 'Status: NOT CLEAR';
+
             // 1. Find the specific field in your config using the ID
             let currentField = null;
-            pagesConfig.forEach(page => {
+            currentConfig.forEach(page => {
                 let found = page.fields.find(f => f.id === id);
                 if (found) currentField = found;
             });
 
             // 2. Change the text based on what the label is
             if (currentField && currentField.label === "Hallway") {
-                // If it's a hallway
                 document.getElementById(`label-${id}`).textContent = isChecked ? 'CLEAR' : 'NOT CLEAR';
             } else {
-                // For all other toggles (like Study Rooms)
                 document.getElementById(`label-${id}`).textContent = isChecked ? 'LOCKED' : 'UNLOCKED';
             }
 
             // Visibility Logic
-            pagesConfig.forEach(page => {
+            currentConfig.forEach(page => {
                 page.fields.forEach(field => {
                     if (field.showIfFalse === id) {
                         const container = document.getElementById(`container-${field.id}`);
                         if (isChecked) {
                             container.style.display = 'none';
-                            appState[field.id] = field.type === 'multiselect' ? [] : '';
-                            // Note: Resetting UI inputs for hidden fields is complex, we just wipe the state here.
+                            appState[field.id] = field.type === 'multiselect' ? [] : (field.type === 'number' ? 0 : '');
                         } else {
                             container.style.display = 'block';
                         }
@@ -281,7 +229,7 @@ document.addEventListener('change', (e) => {
     }
 });
 
-// Also need to catch text typing which doesn't trigger 'change' until you click away
+// Catch text typing which doesn't trigger 'change' until you click away
 document.addEventListener('input', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         if (!e.target.classList.contains('multi-updater') && e.target.type !== 'checkbox') {
@@ -295,9 +243,8 @@ document.addEventListener('input', (e) => {
                     appState[id] = e.target.value;
                 }
 
-                // NEW: Visibility logic for hideIfZero
-                // NEW: Visibility logic for hideIfZero
-                pagesConfig.forEach(page => {
+                // Visibility logic for hideIfZero
+                currentConfig.forEach(page => {
                     page.fields.forEach(field => {
                         if (field.hideIfZero === id) {
                             const container = document.getElementById(`container-${field.id}`);
@@ -306,7 +253,7 @@ document.addEventListener('input', (e) => {
                             // Hide if the value is 0 or empty
                             if (val == 0 || val === '') {
                                 container.style.display = 'none';
-                                appState[field.id] = field.type === 'multiselect' ? [] : '';
+                                appState[field.id] = field.type === 'multiselect' ? [] : (field.type === 'number' ? 0 : '');
 
                                 // Uncheck the boxes visually if it's a multiselect
                                 if (field.type === 'multiselect') {
@@ -329,46 +276,44 @@ document.getElementById('end-btn').addEventListener('click', () => {
     const reportOutput = document.getElementById('report-output');
 
     let reportString = `🦔 COVERAGE NOTES REPORT 🌲\n`;
+    reportString += `Route: ${currentRouteTitle}\n`;
     reportString += `Total Session Time: ${timerDisplay.textContent}\n`;
     reportString += `============================\n\n`;
 
-    pagesConfig.forEach((page) => {
+    currentConfig.forEach((page) => {
         reportString += `--- ${page.title} ---\n`;
         page.fields.forEach((field) => {
 
+            // Skip hidden elements from showing up in the report
             if (field.showIfFalse && appState[field.showIfFalse] === true) {
                 return;
             }
-
-            // if (field.hideIfZero && appState[field.hideIfZero] === true) {
-            //     return;
-            // }
+            if (field.hideIfZero && (appState[field.hideIfZero] == 0 || appState[field.hideIfZero] === '')) {
+                return;
+            }
 
             let value = appState[field.id];
+
             if (field.type === 'toggle') {
                 if (field.label === 'Hallway') {
                     value = value ? 'CLEAR' : 'NOT CLEAR';
-                }
-                else {
+                } else {
                     value = value ? 'LOCKED' : 'UNLOCKED';
                 }
-                //value = value ? 'CLEAR' : 'NOT CLEAR';
             } else if (field.type === 'multiselect') {
-                // Join the array with commas, or print 'None' if empty
                 if (value.length > 0) {
-                    value = value.join(', ')
+                    value = value.join(', ');
                 } else {
-                    return;
+                    return; // Retained your custom skip if empty
                 }
-                //value = value.length > 0 ? value.join(', ') : '';
-                //value = value.length > 0 ? value.join(', ') : 'None selected';
             } else if (value === '') {
                 value = 'N/A';
             }
+
+            // Retained your custom formatting for multiselects vs normal fields
             if (field.type == 'multiselect') {
                 reportString += `${value}\n`;
-            }
-            else {
+            } else {
                 reportString += `${field.label}: ${value}\n`;
             }
         });
