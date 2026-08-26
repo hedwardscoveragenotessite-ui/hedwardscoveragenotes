@@ -354,3 +354,52 @@ input:not(:checked)+.slider:before {
     border-color: var(--forest-green);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
+
+
+/* --- Route Selection Grid --- */
+.route-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Creates 2 equal columns */
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Square button styling */
+.route-grid .route-btn {
+    margin-top: 0;
+    /* Removes standard button margin */
+    aspect-ratio: 1 / 1;
+    /* Forces a perfect square! */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+/* Make the emoji much bigger inside the square */
+.route-grid .route-btn .icon {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+/* 3rd button (Full Tour) spans both columns at the bottom */
+.route-grid .route-btn:nth-child(3) {
+    grid-column: span 2;
+    aspect-ratio: auto;
+    /* Stops it from being a giant square */
+    height: 90px;
+    /* Makes it a nice wide rectangle instead */
+    flex-direction: row;
+    /* Puts emoji and text side-by-side */
+    gap: 15px;
+    font-size: 1.2rem;
+}
+
+.route-grid .route-btn:nth-child(3) .icon {
+    margin-bottom: 0;
+    /* Resets margin for the side-by-side layout */
+}
