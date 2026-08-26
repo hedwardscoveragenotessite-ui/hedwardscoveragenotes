@@ -16,7 +16,7 @@
 
   <!-- Top bar with Timer -->
   <header class="app-header">
-    <div class="title">🦔 Coverage Notes</div>
+    <div class="title">🦔 Hedwards Coverage Notes</div>
     <div class="timer" id="timer">00:00</div>
   </header>
 
@@ -25,6 +25,32 @@
     <div class="swiper-wrapper" id="slider-wrapper">
 
       <!-- Custom Notes Slides will be injected here by JavaScript -->
+
+      <!-- NEW: Route Selection Start Page -->
+      <div class="swiper-slide" id="intro-slide">
+        <div class="card">
+          <h2>🗺️ Choose Route</h2>
+          <p>Select your coverage adventure path </p>
+
+          <!-- The data-route attribute MUST match the names in allConfigs -->
+          <div class="route-grid">
+            <button class="btn action-btn route-btn" data-route="route1">
+              <span class="icon">🍃</span>
+              <span>Hedden Only</span>
+            </button>
+
+            <button class="btn action-btn route-btn" data-route="route2">
+              <span class="icon">🌲</span>
+              <span>Edwards Only</span>
+            </button>
+
+            <button class="btn action-btn route-btn" data-route="route3">
+              <span class="icon">🧭</span>
+              <span>Full Tour</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Final Slide: Report (Always at the end) -->
       <div class="swiper-slide report-slide" id="final-slide">
